@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir Nómina</title>
+</head>
+<body>
+  <h1>Asociación Popular de Ahorros y Préstamos</h1>
+  <h3>Subir archivo TXT de Nómina:</h3>
+  <form id="formulario">
+    <input type="file" id="archivo" name="archivo" accept=".txt" required>
+    <button type="submit">Subir</button>
+  </form>
+
+  <p id="resultado"></p>
+
+  <script>
+  const form = document.getElementById('formulario');
+  const resultado = document.getElementById('resultado');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const file = document.getElementById('archivo').files[0];
+    if (!file) {
+      resultado.textContent = 'Selecciona un archivo .txt';
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('archivo', file);
+
+    try {
+      const res = await fetch('http://localhost:3000/upload', { method: 'POST', body: fd });
+      const text = await res.text();   
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error(text); }
+
+      resultado.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      console.error(err);
+      resultado.textContent = 'Error: ' + err.message;
+    }
+  });
+</script>
+</body>
+</html>
